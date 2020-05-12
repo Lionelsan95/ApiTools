@@ -13,13 +13,17 @@ use JMS\Serializer\Serializer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\TraceableValidator;
 
 class ArticlController extends AbstractFOSRestController
 {
     private $serializer;
-    public function __construct(Serializer $serializer)
+    private $validator;
+    public function __construct(Serializer $serializer, TraceableValidator $validator)
     {
         $this->serializer = $serializer;
+        $this->validator = $validator;
     }
 
     /**
@@ -37,14 +41,21 @@ class ArticlController extends AbstractFOSRestController
 
     /**
      * @Rest\Post(
-     *     path = "/api/create",
+     *     path = "/api/article/create",
      *     name = "create_article"
      * )
      *
      * @Rest\View
-     * @ParamConverter("article", converter="fos_rest.request_body")
+     * @ParamConverter(
+     *     "article",
+     *     converter="fos_rest.request_body",
+     *     options={
+     *          "validator"={"groups"="Create"}
+     *       }
+     *
+     * )
      */
-    public function createAction(Article $article){
+    public function createAction(Article $article, ConstraintViolationList $violations){
 
         /*$data = $this->serializer->deserialize($request->getContent(), 'array', 'json');
 
@@ -52,6 +63,10 @@ class ArticlController extends AbstractFOSRestController
 
         $form = $this->get('form.factory')->create(ArticleType::class, $article);
         $form->submit($data);*/
+
+        if(count($violations)){
+            return $this->view($violations, Response::HTTP_BAD_REQUEST);
+        }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($article);
