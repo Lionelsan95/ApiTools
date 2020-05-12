@@ -27,7 +27,7 @@ class AuthorController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="show", methods={"GET"} requirements={"id":"\d+"})
+     * @Route("/{id}", name="show", methods={"GET"}, requirements={"id":"\d+"})
      */
     public function showAction(Author $author){
         $data = $this->get('serializer')->serializer($author, "json");

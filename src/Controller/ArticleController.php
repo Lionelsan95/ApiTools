@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use JMS\Serializer\SerializationContext;
+use JMS\Serializer\Serializer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,11 +17,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ArticleController extends AbstractController
 {
-    private $em;
-    /*public function __construct()
+    private $serializer;
+
+    public function __construct(Serializer $serializer)
     {
-        $this->em = $this->getDoctrine()->getManager();
-    }*/
+        $this->serializer = $serializer;
+    }
 
     /**
      * @Route("/", name="index")
@@ -37,7 +39,7 @@ class ArticleController extends AbstractController
      */
     public function createAction(Request $request){
         $data = $request->getContent();
-        $article = $this->get('serializer')->deserialize($data, 'App\Entity\Article', 'json');
+        $article = $this->serializer->deserialize($data, 'App\Entity\Article', 'json');
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($article);
@@ -50,7 +52,7 @@ class ArticleController extends AbstractController
      * @Route("/{id}", name="show", methods={"GET"}, requirements={"id"="\d+"})
      */
     public function showAction(Article $article){
-        $data = $this->get('serializer')->serialize($article, 'json', SerializationContext::create()->setGroups(array('list')));
+        $data = $this->serializer->serialize($article, 'json', SerializationContext::create()->setGroups(array('detail')));
 
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
@@ -64,7 +66,7 @@ class ArticleController extends AbstractController
     public function getAction($limit = 5){
         $articles = $this->getDoctrine()->getRepository('App:Article')->findBy(array(), array(), $limit);
 
-        $data = $this->get('serializer')->serialize($articles, 'json');
+        $data = $this->serializer->serialize($articles, 'json', SerializationContext::create()->setGroups(array('list')));
         $response = new Response($data);
         $response->headers->set('Content-Type', 'application/json');
 

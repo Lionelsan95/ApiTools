@@ -14,7 +14,6 @@ class ArticleListener implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        // TODO: Implement getSubscribedEvents() method.
         return array(
             [
                 'event'  => Events::POST_SERIALIZE,
@@ -26,9 +25,7 @@ class ArticleListener implements EventSubscriberInterface
     }
 
     public function onPostSerialize(ObjectEvent $event){
-        $object = $event->getObject();
-
         $date = new \DateTime();
-        $event->getVisitor()->visitorProperty(new StaticPropertyMetadata('', 'deliver_at', null), $date->format('l jS \of F Y h:i:s A'));
+        $event->getVisitor()->visitProperty(new StaticPropertyMetadata('', 'deliver_at', null), $date->format('l jS \of F Y h:i:s A'));
     }
 }
