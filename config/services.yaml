@@ -26,6 +26,9 @@ services:
     App\Controller\ArticleController:
         arguments : ['@jms_serializer']
 
+    App\Controller\ArticlController:
+        arguments : ['@jms_serializer']
+
     serializer_listener.article:
         class : App\Serializer\Listener\ArticleListener
         tags:

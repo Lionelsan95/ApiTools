@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=ArticleRepository::class)
  *
+ * @Serializer\ExclusionPolicy("ALL")
  */
 class Article
 {
@@ -17,21 +18,21 @@ class Article
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      *
-     * @Serializer\Groups({"detail"})
+     * @Serializer\Expose
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * @Serializer\Groups({"detail", "list"})
+     * @Serializer\Expose
      */
     private $title;
 
     /**
      * @ORM\Column(type="text")
      *
-     * @Serializer\Groups({"detail", "list"})
+     * @Serializer\Expose
      *
      */
     private $content;
@@ -78,6 +79,7 @@ class Article
     public function setAuthor(?Author $author): self
     {
         $this->author = $author;
+        $this->author->addArticle($this);
 
         return $this;
     }
