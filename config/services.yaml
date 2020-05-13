@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    weather_api_key : 3f80b65764be97f2b952631b4343501c
 
 services:
     # default configuration for services in *this* file
@@ -27,12 +28,24 @@ services:
         arguments : ['@jms_serializer']
 
     App\Controller\ArticlController:
-        arguments : ['@jms_serializer']
+        arguments : ['@jms_serializer', '@debug.validator']
 
     serializer_listener.article:
         class : App\Serializer\Listener\ArticleListener
         tags:
             - { name : serializer.event_subscriber }
 
+
+    app.normalizer.resource_validation_exception:
+        class: App\Normalizer\NotFoundHttpExceptionNormalizer
+        arguments:
+            - { type: 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException' }
+        tags:
+            - { name: app.normalizer }
+
+    app.weather:
+        class: App\Weather\Weather
+        arguments : ['@csa_guzzle.client.weather', '@jms_serializer']
+        public: true
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
