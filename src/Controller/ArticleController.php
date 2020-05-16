@@ -73,4 +73,13 @@ class ArticleController extends AbstractController
         return $response;
 
     }
+
+    /**
+     * @Route("delete/{id}", name="delete", methods={"DELETE"})
+     */
+    public function deleteAction($id){
+
+        $em = $this->getDoctrine()->getManager();
+
+    }
 }
